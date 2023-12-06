@@ -2,13 +2,7 @@
 input_filename = "input.txt"
 
 function nb_of_int(x, y)
-    if floor(y) - floor(x) == 0
-        return 0
-    elseif floor(y) == y
-        return floor(Int, y) - floor(Int, x) - 1
-    else
-        return floor(Int, y) - floor(Int, x)
-    end
+    return ceil(Int, y-1) - floor(Int, x)
 end
 
 function compute_score(course_time, record)
