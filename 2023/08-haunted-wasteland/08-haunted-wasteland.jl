@@ -69,8 +69,6 @@ end
 
 function part_2(instructions, map)
     locations = [e for e in filter(x->endswith(x, "A"), keys(map))]
-    println(typeof(locations))
-    println(locations)
     lam = (x->part_2_aux(instructions, map, x))
     steps = lam.(locations)
 
@@ -81,8 +79,8 @@ end
 
 instructions, map = parse_map(input_filename)
 
-# n_step_1 = part_1(instructions, map)
-# println("Part 1: ", n_step_1)
+n_step_1 = part_1(instructions, map)
+println("Part 1: ", n_step_1)
 
 n_step_2 = part_2(instructions, map)
 println("Part 2: ", n_step_2)
