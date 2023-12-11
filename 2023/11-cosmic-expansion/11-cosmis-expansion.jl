@@ -34,9 +34,9 @@ function get_coords(mat, dist=1)
 end
 
 
-function part_1(mat, dist=1)
+function compute_sum_dist(mat, dist=1)
     coord_x, coord_y = get_coords(mat, dist)
-    galaxies = Tuple.(findall(x -> x != 0, mat))
+    galaxies = Tuple.(findall(!=(0), mat))
 
     sum = 0
     for k in eachindex(galaxies)
@@ -55,7 +55,7 @@ end
 
 
 mat = mat_of_input(input_filename)
-I = part_1(mat)
+I = compute_sum_dist(mat)
 println("I = ", I)
-II = part_1(mat, 1000000-1)
+II = compute_sum_dist(mat, 1000000-1)
 println("II = ", II)
