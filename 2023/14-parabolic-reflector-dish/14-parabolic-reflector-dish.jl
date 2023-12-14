@@ -1,7 +1,6 @@
-input_filename = "example.txt"
-# input_filename = "input.txt"
+# input_filename = "example.txt"
+input_filename = "input.txt"
 
-using ProgressBars
 
 map = (x) -> x == '.' ? 0 : x == 'O' ? 1 : 2
 pam = (x) -> x == 0 ? '.' : x == 1 ? 'O' : '#'
@@ -54,9 +53,6 @@ function tilt_platform_aux(plat, dir, rocks)
                     plat[rock] = 0
                     push!(updated_rocks, idx_)
                 end
-                # if  plat[idx_] == 1 && idx_ in rocks
-                #     push!(updated_rocks, rock)
-                # end
             end
         end
         tilt_platform_aux(plat, dir, updated_rocks)
@@ -85,12 +81,28 @@ end
 
 
 function part_II(plat, n_cyle=1000000000)
-    for _ in ProgressBar(1:n_cyle)
+    mem = []
+    plat_init = copy(plat)
+    push!(mem, plat_init)
+    idx_loop = 0
+    for i in 1:n_cyle
         tilt_platform(plat, 'N')
         tilt_platform(plat, 'W')
         tilt_platform(plat, 'S')
         tilt_platform(plat, 'E')
+        if plat in mem
+            idx_loop = findfirst( ==(plat), mem)
+            break
+        end
+        push!(mem, copy(plat))
     end
+    loop_mem = mem[idx_loop:end]
+    loop_size = length(loop_mem)
+    # println("Mem ", length(mem))
+    # println("Loop size = ", loop_size)
+    # println("Index loop = ", idx_loop)
+    # println("IDX = ", mod1(n_cyle - idx_loop + 2, loop_size))
+    plat .= loop_mem[mod1(n_cyle - idx_loop + 2, loop_size)]
 end
 
 plat = parse_input(input_filename)
@@ -108,8 +120,8 @@ println("I = ", I)
 
 plat_II = copy(plat)
 part_II(plat_II, 1000000000)
-str = back_to_string(plat_II)
-println('\n', str)
+# str = back_to_string(plat_II)
+# println('\n', str)
 
 II = count_weight(plat_II)
 println("II = ", II)
