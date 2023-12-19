@@ -1,3 +1,5 @@
+using ProgressBars
+
 # input_filename = "example.txt"
 input_filename = "input.txt"
 
@@ -79,6 +81,21 @@ function part_I(workflows, parts)
     return sum(r .* s)
 end
 
+function part_II(workflows)
+    nb = 0
+    for x in 1:4000
+        for m in 1:4000
+            for a in ProgressBar(1:4000)
+                for s in 1:4000
+                    if is_accepted([x, m, a, s], workflows)
+                        nb += 1
+                    end
+                end
+            end
+        end
+    end
+    return nb
+end
 
 workflows, parts = parse_input(input_filename)
 # println(typeof(workflows["px"]))
@@ -93,6 +110,8 @@ workflows, parts = parse_input(input_filename)
 
 I = part_I(workflows, parts)
 println("I: ", I)
+II = part_II(workflows)
+println("II: ", II)
 
 
 # println(eval(workflows["px"], :(x = 15000), :(m = 10), :(a = 15000), :(s = 15000)))
