@@ -32,7 +32,6 @@ function get_workflow(str)
 end
 
 function parse_input(filename::String)
-    permutations = []
     split_file = split(strip(read(filename, String)), "\n\n")
 
     line_by_line = split.(split_file, "\n")
