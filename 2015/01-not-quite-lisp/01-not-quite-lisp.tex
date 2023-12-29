@@ -1,0 +1,62 @@
+\documentclass{article}
+
+\makeatletter
+% Define a macro to iterate over characters of a string
+\def\goSantaGo#1{%
+  \expandafter\@goSantaGo#1\relax
+}
+\def\@goSantaGo#1{%
+  \advance\idx by1
+  % Process the current character
+  \ifx\relax#1%
+    % End of the string
+  \else
+    %
+    \if #1)%
+      \advance\floor by-1
+    \else
+      \advance\floor by1
+    \fi
+    % \the\idx: on floor \the\floor \texttt{#1}\par
+    %
+    \ifnum\floor<0
+      \ifnum\basement=-1
+        % Entering basement at position \the\idx\par
+        \basement=\idx
+      \fi
+    \fi
+    % Move to the next character
+    \expandafter\@goSantaGo
+    %
+  \fi
+}
+
+\makeatother
+
+\begin{document}
+
+% Open the file for reading
+\newread\myfile
+\openin\myfile=input.txt
+
+% Define a macro to store the contents of the file
+\newtoks\filecontent
+\read\myfile to \filecontent
+
+% Close the file
+\closein\myfile
+
+\newcount\floor
+\floor=0
+\newcount\idx
+\newcount\basement
+\basement=-1
+
+% Example usage
+\goSantaGo{\filecontent}
+
+1: \the\floor
+
+2: \the\basement
+
+\end{document}
