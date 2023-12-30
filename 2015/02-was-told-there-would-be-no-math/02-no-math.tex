@@ -1,0 +1,100 @@
+\documentclass{article}
+\usepackage{xparse}
+
+\newcommand{\minThree}[3]{%
+  \ifnum#1<#2
+    \ifnum#1<#3
+      #1
+    \else
+      #3
+    \fi
+  \else
+    \ifnum#2<#3
+      #2
+    \else
+      #3
+    \fi
+  \fi
+}
+
+
+\newcounter{resultI}
+\newcounter{resultII}
+\newcounter{minArea}
+\newcounter{minPerimeter}
+\newcounter{paper}
+\newcounter{ribbon}
+
+\newcommand{\calculateAndSetCounter}[1]{%
+  % Split the string at 'x' and convert each part to a number
+  \def\temp##1x##2x##3\relax{%
+    \newcount\l
+    \newcount\w
+    \newcount\h
+    \l=##1
+    \w=##2
+    \h=##3
+    \newcount\areaOne
+    \newcount\areaTwo
+    \newcount\areaThree
+    \newcount\perimeterOne
+    \newcount\perimeterTwo
+    \newcount\perimeterThree
+    \newcount\volume
+    %
+    \areaOne=\numexpr\l*\w\relax
+    \areaTwo=\numexpr\w*\h\relax
+    \areaThree=\numexpr\h*\l\relax
+    %
+    \perimeterOne=\numexpr 2*\l + 2*\w \relax
+    \perimeterTwo=\numexpr 2*\w + 2*\h \relax
+    \perimeterThree=\numexpr 2*\h + 2*\l \relax
+    \volume=\numexpr \l*\w*\h \relax
+    %
+    % Here: \the\l, \the\w, \the\h\par
+    \setcounter{minArea}{\minThree{\the\areaOne}{\the\areaTwo}{\the\areaThree}}
+    \setcounter{minPerimeter}{\minThree{\the\perimeterOne}{\the\perimeterTwo}{\the\perimeterThree}}
+    \setcounter{resultI}{\numexpr 2*\l*\w + 2*\w*\h + 2*\h*\l + \theminArea \relax}%
+    \setcounter{resultII}{\numexpr \theminPerimeter + \the\volume \relax}%
+  }%
+  % Expand the argument before calling \temp
+  \expandafter\temp#1\relax
+  % \theresultI,%
+}
+
+
+\ExplSyntaxOn
+% variables
+
+\ior_new:N \g__sergiokapone_count_ior
+\int_new:N \l__sergiokapone_count_int
+
+% user level commands
+\NewDocumentCommand{\wrappingPaper}{ m }
+{
+  \ior_open:Nn \g__sergiokapone_count_ior {#1}
+  \ior_map_inline:Nn \g__sergiokapone_count_ior
+    {
+      \int_incr:N \l__sergiokapone_count_int
+      \calculateAndSetCounter{##1}
+      \addtocounter{paper}{\theresultI}
+      \addtocounter{ribbon}{\theresultII}
+      % Cumulative~total:~\thepaper\par
+    }
+  Part~1:~\thepaper\par
+  Part~2:~\theribbon\par
+}
+
+\ExplSyntaxOff
+
+
+\begin{document}
+Day 2: I Was Told There Would Be No Math
+
+
+% \wrappingPaper{example.txt}
+
+\wrappingPaper{input.txt}
+
+
+\end{document}
