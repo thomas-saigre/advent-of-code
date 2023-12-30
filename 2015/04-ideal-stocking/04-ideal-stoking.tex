@@ -1,0 +1,70 @@
+\documentclass{article}
+\usepackage{etoolbox}
+
+\newcount\done
+\done=0
+
+\def\setStringVariable#1#2{%
+    \expandafter\def\csname#1\endcsname{#2}%
+}
+\def\getStringVariable#1{%
+    \csname#1\endcsname
+}
+
+\def\checkStringsEqual#1#2{%
+    \expandafter\ifstrequal\expandafter{#1}{#2}
+        {\done=1}{}%
+}
+
+\makeatletter
+\newcommand{\checkFirstFive}[1]{%
+    % Extract the first five characters
+    % \typeout{____________Checking for #1}
+    \def\@tempa##1##2##3##4##5##6\relax{%
+        % ##1, ##2, ##3, ##4, ##5 and ##6%\par
+        \checkStringsEqual{##1##2##3##4##5}{00000}
+  }%
+  \@tempa#1\relax
+}
+\newcommand{\checkFirstSix}[1]{%
+    % Extract the first five characters
+    % \typeout{____________Checking for #1}
+    \def\@tempa##1##2##3##4##5##6##7\relax{%
+        % ##1, ##2, ##3, ##4, ##5 and ##6%\par
+        \checkStringsEqual{##1##2##3##4##5##6}{000000}
+  }%
+  \@tempa#1\relax
+}
+\makeatother
+
+
+
+\begin{document}
+
+\def\input{ckczppom}
+
+\newcount\i
+\loop\ifnum\done=0
+    \advance\i by1
+    \setStringVariable{hash}{\pdfmdfivesum{\input\the\i}}
+    % \the\i : \texttt{\getStringVariable{hash}}
+    \expanded{\noexpand\checkFirstFive{\hash}}
+    % \typeout{\the\i : \getStringVariable{hash} (\the\done)}
+\repeat
+
+1: \the\i
+
+\i=0
+\done=0
+\loop\ifnum\done=0
+    \advance\i by1
+    \setStringVariable{hash}{\pdfmdfivesum{\input\the\i}}
+    % \the\i : \texttt{\getStringVariable{hash}}
+    \expanded{\noexpand\checkFirstSix{\hash}}
+    % \typeout{\the\i : \getStringVariable{hash} (\the\done)}
+\repeat
+
+2: \the\i
+
+
+\end{document}
