@@ -87,16 +87,16 @@ function press_button_1(modules, connected_conj)
     return n_pulse
 end
 
-function press_button_2(modules, connected_conj)
+function press_button_2(modules, connected_conj, button="rx")
     Q = Queue{Tuple{String, Int64, String}}()
     enqueue!(Q, ("roadcaster", 0, "button"))
 
 
     while !isempty(Q)
         name, pulse, source = dequeue!(Q)
-        # println(source, " -", (pulse==1) ? "high" : "low", "-> ", name)
 
-        if name == "rx" && pulse == 0
+        if name == button && pulse == 0
+            println(source, " -", (pulse==1) ? "high" : "low", "-> ", name)
             return true
         end
 
@@ -141,13 +141,18 @@ function press_n_button(modules, n)
 end
 
 function activate_machine(modules)
-    connected_conj = create_connected_conj(modules)
-    n_push = 0
-    while !press_button_2(modules, connected_conj)
-        n_push += 1
-        # println(n_push)
+    n_push_list = [0, 0, 0, 0]
+    for (i, name) in enumerate(["lk", "zv", "xt", "sp"])
+        n_push = 0
+        connected_conj = create_connected_conj(modules)
+        while !press_button_2(modules, connected_conj, name)
+            n_push += 1
+        end
+        n_push_list[i] = n_push
     end
-    return n_push
+    println(n_push_list)
+    # return lcm(n_push_list...)
+    return reduce(*, n_push_list)
 end
 
 
@@ -158,3 +163,5 @@ println("Part I: ", I)
 
 II = activate_machine(modules)
 println("Part II: ", II)
+# >= 30464484388140
+# >= 182786906328840
