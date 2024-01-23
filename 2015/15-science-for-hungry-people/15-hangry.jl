@@ -12,10 +12,10 @@ for b in   0: (target_sum -   first_vl) a = first_vl;
 for c in   0:(target_sum +0          - first_vl - b);
 d_valu =   target_sum - a - b - c;   d = d_valu;if a+
 b+c+d ==   target_sum;push!(resul,   [first_vl, b, c,
-d] ) end   end end #=_𝘈𝘰𝘊_ =# end;   return resul end
-target_s   = 100; 💌 = f(target_s)   ;function d(vct)
+d] ) end   end end #=_AoC_ =# end;   return resul end
+target_s   = 100; LL = f(target_s)   ;function d(vct)
 m=-1;for   v in vct c=cost(          v, tab); if c> m
 m = c;end;end; return m end;function g(vct); m = -1.;
 for v in vct; c = cost(v, tab);if c >m&& (calories(v,
 tab) == 500) m = c end end; return trunc(Int, m) end;
-#=EAT=# println(d(💌));println(g(💌)) #=COOKIES 🍪 =#
+#=EAT=# println(d(LL));println(g(LL)) #=COOKIES 🍪 =#
