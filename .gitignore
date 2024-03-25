@@ -2,6 +2,7 @@
 *.dvi
 *.log
 *.pdf
+!2023/20-pulse-propagation/20-part-II.pdf
 *.aux
 *.fdb_latexmk
 *.fls

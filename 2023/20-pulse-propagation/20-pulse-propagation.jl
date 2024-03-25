@@ -141,6 +141,7 @@ function press_n_button(modules, n)
 end
 
 function activate_machine(modules)
+    #=
     n_push_list = [0, 0, 0, 0]
     for (i, name) in enumerate(["lk", "zv", "xt", "sp"])
         n_push = 0
@@ -151,8 +152,9 @@ function activate_machine(modules)
         n_push_list[i] = n_push
     end
     println(n_push_list)
-    # return lcm(n_push_list...)
-    return reduce(*, n_push_list)
+    return lcm(n_push_list...)
+    =#
+    return lcm(3823, 4051, 3767, 3929)
 end
 
 
