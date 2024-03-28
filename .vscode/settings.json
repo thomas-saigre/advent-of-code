@@ -1,3 +1,4 @@
 {
-    "julia.environmentPath": "/home/saigre/Documents/code/advent-of-code"
+    "julia.environmentPath": "/home/saigre/Documents/code/advent-of-code",
+    "asciidoc.antora.enableAntoraSupport": true
 }

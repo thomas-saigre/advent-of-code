@@ -1,0 +1,8 @@
+= With spreadsheet 📊
+
+* Cells `A1:A2001` : load data from input
+* Cell `B3` : `=IF(A3>A2, 1, 0)` (drag down)
+* Cell `B1` : `=SUM(B2:B2001)` *Result of part I*
+* Cell `C2` : `=A2+A3+A4` (drag down)
+* Cell `D3` : `=IF(C4>C3, 1, 0)` (drag down)
+* Cell `D1` : `=SUM(D3:D2001)` *Result of part II*
