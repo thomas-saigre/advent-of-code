@@ -1,6 +1,5 @@
 import numpy as np
 import matplotlib.pyplot as plt
-import concurrent.futures
 import matplotlib.image
 
 MEM_VAL = 1
@@ -93,6 +92,7 @@ def partII(init=2938):      # magic !
         if dist == np.inf:
             crt = False
             print("II:", f"{input[i][0]},{input[i][1]}")
+            memory[0,0] = PATH_VAL
             matplotlib.image.imsave('pathII.png', memory, cmap="viridis")
         i += 1
 
