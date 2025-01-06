@@ -1,6 +1,5 @@
 using FStrings
 using IterTools
-using Dates
 using BenchmarkTools
 
 function parse_input(filename::String)
@@ -53,17 +52,17 @@ function 🗄️(a::Int, b::Int)
 end
 
 
-input_filename = "example.txt"
-# input_filename = "input.txt"
+# input_filename = "example.txt"
+input_filename = "input.txt"
 
 results, values = parse_input(input_filename)
 # println(results)
 
 @time I = test_line.(results, values, 1)
-# Surely not optimized : it took 314.604221 s to run !
+# Surely not optimized : it took 279.168415 s to run !
 
 @time II = test_line.(results, values, 2)
-# Surely not optimized at all : it took ... to run !
+# Surely not optimized at all : it took 62326.489825 s (17 h) to run !
 
 println(f"I : {sum(I)}")
 println(f"II: {sum(II)}")
