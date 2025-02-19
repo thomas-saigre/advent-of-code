@@ -1,0 +1,15 @@
+# Using Gimp
+
+Run the code to generate the image of the trajectory of the submarine, then open it with Gimp.
+Look for the red pixel and multiply the two coordinates to get the answer.
+
+
+This doesn't works quite well for the second part, as the depth is much much higher, actually the generated file is too large for Gimp to load it:
+
+```
+The “gimp-image-new-with-precision” procedure was called with the value “800466” for the “height” parameter (n°2, type GimpInt32). This value is out of range.
+```
+
+And the image file is very heavy: `8.1 Mo` (so I won't upload it here !).
+
+Also, for part II, as the image is very huge, I manually set-up the image size so the code won't crash in trying to create a huge image.
