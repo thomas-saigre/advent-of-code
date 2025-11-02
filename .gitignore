@@ -3,7 +3,7 @@
 *.log
 *.pdf
 !2023/20-pulse-propagation/20-part-II.pdf
-!2015/07-some-assembly-required/circuit.pdf
+!2015/07-some-assembly-required/circuit*.pdf
 *.aux
 *.fdb_latexmk
 *.fls
