@@ -80,9 +80,9 @@ let anti_tsp_niais ville =
 	done;
 	!m
 
+(*
 let c = tous_les_chemins 8;;
-
-(* let l = longueur_chemin dist c.(0);;
+let l = longueur_chemin dist c.(0);;
 print_int l;;
 print_endline "";; *)
 
