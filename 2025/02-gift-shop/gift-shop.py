@@ -28,10 +28,10 @@ print(f"I : {I}")
 
 II = 0
 for n in range(max_check + 1):
-    for nb in range(2,7):
+    for nb in range(2,11):
         v = int(nb * str(n))
         if v in s:
-            print(v, n, nb)
+            # print(v, n, nb)
             s.remove(v)
             II += v
 print(f"II: {II}")
