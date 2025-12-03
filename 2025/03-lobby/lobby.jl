@@ -11,5 +11,18 @@ function partI(l)
     end
 end
 
+function partII(l, n=12)
+    s = ""
+    idx = 0
+    for i in (n-1):-1:0
+        idx += argmax(l[idx+1:end-i])
+        s *= l[idx]
+    end
+    return parse(Int, s)
+end
+
 I = sum(partI.(split.(eachline(file),"")))
 println(I)
+
+II = sum(partII.(split.(eachline(file),"")))
+println(II)
