@@ -8,7 +8,7 @@ _You can click on the stars to see my solutions._
 
 | Day  | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 |
 |:----:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:--:|:--:|:--:|
-| 2025 | [★★](2025/01-secret-entrance/secret-entrance.tex) (`TeX`) | [★★](2025/02-gift-shop/gift-shop.py) (`python`) | [★★](2025/03-lobby/lobby.jl) (`julia` [and 🏌️](2025/03-lobby/golf.jl)) | [★★](2025/04-printing-department/printing-department.jl) (`julia`) | [★★](2025/05-cafetaria/cafetaria.jl) (`julia`) | [★★](2025/06-trash-compactor/06.py) (`python`) | [★★](2025/07-laboratories/07-lab.cpp) (`C++`) | [★★](2025/08-playground/playground.jl) (`julia`) | [★★](2025/09-movie-theatre/cinema.sh) (`bash` ⏳) | [😬](2025/10-factory/factory.jl) (`julia`) | [★★](2025/11-reactor/reactor.jl) (`julia`) | [★](2025/12-christmass-tree-farm/ctf.jl) (`julia`) |
+| <span style="color:gold">2025</span> | [★★](2025/01-secret-entrance/secret-entrance.tex) (`TeX`) | [★★](2025/02-gift-shop/gift-shop.py) (`python`) | [★★](2025/03-lobby/lobby.jl) (`julia` [and 🏌️](2025/03-lobby/golf.jl)) | [★★](2025/04-printing-department/printing-department.jl) (`julia`) | [★★](2025/05-cafetaria/cafetaria.jl) (`julia`) | [★★](2025/06-trash-compactor/06.py) (`python`) | [★★](2025/07-laboratories/07-lab.cpp) (`C++`) | [★★](2025/08-playground/playground.jl) (`julia`) | [★★](2025/09-movie-theatre/cinema.sh) (`bash` ⏳) | [★★](2025/10-factory/factory.jl) (`julia`) | [★★](2025/11-reactor/reactor.jl) (`julia`) | [★★](2025/12-christmass-tree-farm/ctf.jl) (`julia`) |
 
 
 
