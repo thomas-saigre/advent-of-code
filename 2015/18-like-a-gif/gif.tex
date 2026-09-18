@@ -1,0 +1,240 @@
+% LTeX: enabled=false
+\documentclass{article}
+\usepackage[T1]{fontenc}
+\usepackage{ifthen}
+\usepackage{tikz}
+% \usepackage[left=0.2cm, right=0.2cm, top=0.2cm, bottom=0.2cm]{geometry}
+\usepackage[left=1.5cm,right=1.5cm,top=2cm,bottom=2cm]{geometry}
+\usepackage{url}
+\usepackage{minted}
+\providecommand{\mintex}[1]{\mintinline[breaklines]{tex}{#1}}
+
+\title{Advent of code : 2015 day 18}
+\author{In \LaTeX\ }
+\date{Many years later !}
+
+
+\def\setpos#1#2#3{\expandafter\def\csname GO-#1-#2-\endcsname{#3}}
+\def\getpos#1#2{\csname GO-#1-#2-\endcsname}
+\def\setmpos#1#2#3{\expandafter\def\csname TMP-#1-#2-\endcsname{#3}}
+\def\getmpos#1#2{\csname TMP-#1-#2-\endcsname}
+
+\newif\ifcontinue
+\makeatletter
+
+% Fill the current line of the main array, from the input string
+\def\treatLine#1{%
+  \expandafter\@treatLine#1\relax
+}
+\def\@treatLine#1{%
+    \advance\idj by1
+    \ifx\relax#1%
+        % End of the string
+    \else
+        \ifx #1.%
+            % Off
+            % \the\idi\ \the\idj\ is Off
+            \else
+            % On
+            % \the\idi\ \the\idj\ is On
+            \setpos{\the\idi}{\the\idj}{1}
+        \fi
+        \expandafter\@treatLine
+    \fi
+}
+
+% Display the array of light in a tikz figure
+% Also displays the number of light that are on
+\def\display{%
+    \newcount\nbon
+    \nbon=0
+    \begin{tikzpicture}[scale=0.1]
+        \foreach \i in {1,2,...,100}{%
+            \foreach \j in {1,2,...,100}{%
+                \if\getpos{\i}{\j}1
+                    \global\advance\nbon by1
+                    \draw[fill=magenta] (\i, \j) circle[radius=0.5cm];
+                \else
+                    \draw[] (\i, \j) circle[radius=0.5cm];
+                \fi
+            }
+        }
+        \draw (101, 100) node[anchor=north west] {\the\nbon\ are On};
+    \end{tikzpicture}
+}
+
+\def\counton{%
+    \newcount\nbon
+    \nbon=0
+    \foreach \i in {1,2,...,100}{%
+        \foreach \j in {1,2,...,100}{%
+            \if\getpos{\i}{\j}1
+                \global\advance\nbon by1
+                % F\,\the\nbon
+            \fi
+        }
+    }
+    There are \the\nbon\ that are On!
+}
+
+\begin{document}
+
+\maketitle
+
+\section{Read the input file}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Text 🡓
+
+In this document, we define a « two dimensional » array to store the lights\footnote{Source: \url{https://tex.stackexchange.com/a/367490/243474}.}.
+It defines two macros \mintex{\setpos} and \mintex{\getpos} that allow to respectively set and read the value at a given row and column in the array.
+
+\begin{minted}{tex}
+\def\setpos#1#2#3{\expandafter\def\csname GO-#1-#2-\endcsname{#3}}
+\def\getpos#1#2{\csname GO-#1-#2-\endcsname}
+\end{minted}
+
+To fill this array, we read the input file and treat each line one after the other.
+To do so, we use two cunts \mintex{\idi} and \mintex{\idj} that will be the indices of the light in the array, and read the file line by line into \mintex{\content}
+Then for each line, we use a separate macro, \mintex{\treatLine{\content}} that will recursively treat each character of the line.
+If the character is a \texttt{.}, then nothing happens, and if it's another character (in the present case, it is always a \texttt{\#}) then the corresponding case of the array is set to \texttt{1}.
+In these process, we manually increment the values of \mintex{\idi} and \mintex{\idj}.
+
+\begin{minted}{tex}
+% Open the file for reading
+\newread\myfile
+\openin\myfile=input.txt
+
+\newcount\idi
+\idi=0
+\newcount\idj
+\idj=0
+
+% Define a macro to store the contents of the file
+\newtoks\content
+
+\continuetrue
+\loop
+\read\myfile to \content
+
+\ifeof\myfile
+    \continuefalse
+\else
+    \advance\idi by1
+    \idj=0
+    % \content
+    \treatLine{\content}
+    % \parseline{\content}
+    % Line is \content
+\fi
+\ifcontinue
+\repeat
+
+% Close the file
+\closein\myfile
+\end{minted}
+
+\begin{minted}{tex}
+\newif\ifcontinue
+\makeatletter
+
+% Fill the current line of the main array, from the input string
+\def\treatLine#1{%
+  \expandafter\@treatLine#1\relax
+}
+\def\@treatLine#1{%
+    \advance\idj by1
+    \ifx\relax#1%
+        % End of the string
+    \else
+        \ifx #1.%    % Off
+        \else%       % On
+            \setpos{\the\idi}{\the\idj}{1}
+        \fi
+        \expandafter\@treatLine
+    \fi
+}
+\end{minted}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Code 🡓
+
+
+% Open the file for reading
+\newread\myfile
+\openin\myfile=input.txt
+
+\newcount\idi
+\idi=0
+\newcount\idj
+\idj=0
+
+% Define a macro to store the contents of the file
+\newtoks\content
+
+\continuetrue
+\loop
+\read\myfile to \content
+
+\ifeof\myfile
+    \continuefalse
+\else
+    \advance\idi by1
+    \idj=0
+    % \content
+    \treatLine{\content}
+    % \parseline{\content}
+    % Line is \content
+\fi
+\ifcontinue
+\repeat
+
+% Close the file
+\closein\myfile
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Text 🡓
+
+\section{Display the table, and count the lights}
+
+By making a nested loop, we can display the array and count the light that are on.
+Precisely, we use a count initially at 0 and use two \mintex{foreach} loops.
+Note that we need to use the \mintex{\global} keywords inside the loop\footnote{\url{https://tex.stackexchange.com/a/766457/243474}.}.
+
+We define two macros \mintex{\display} and \mintex{\counton} that to that.
+Note the second is ientical to the first on, but without the display using Ti\emph{k}Z (so I do not rewrite the code here).
+
+\begin{minted}{tex}
+\def\display{%
+    \newcount\nbon
+    \nbon=0
+    \begin{tikzpicture}[scale=0.1]
+        \foreach \i in {1,2,...,100}{%
+            \foreach \j in {1,2,...,100}{%
+                \if\getpos{\i}{\j}1
+                    \global\advance\nbon by1
+                    \draw[fill=magenta] (\i, \j) circle[radius=0.5cm];
+                \else
+                    \draw[] (\i, \j) circle[radius=0.5cm];
+                \fi
+            }
+        }
+        \draw (101, 100) node[anchor=north west] {\the\nbon\ are On};
+    \end{tikzpicture}
+}
+\end{minted}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Code 🡓
+
+
+\display
+
+\counton
+
+
+
+
+\end{document}
