@@ -1,23 +1,36 @@
-% LTeX: enabled=false
 \documentclass{article}
 \usepackage[T1]{fontenc}
 \usepackage{ifthen}
 \usepackage{tikz}
-% \usepackage[left=0.2cm, right=0.2cm, top=0.2cm, bottom=0.2cm]{geometry}
+\usetikzlibrary{math}
 \usepackage[left=1.5cm,right=1.5cm,top=2cm,bottom=2cm]{geometry}
 \usepackage{url}
 \usepackage{minted}
 \providecommand{\mintex}[1]{\mintinline[breaklines]{tex}{#1}}
+
+% Open the file for reading
+\newread\myfile
+\def\size{6}
+\openin\myfile=example.txt
+% \def\size{100}
+% \openin\myfile=input.txt
 
 \title{Advent of code : 2015 day 18}
 \author{In \LaTeX\ }
 \date{Many years later !}
 
 
-\def\setpos#1#2#3{\expandafter\def\csname GO-#1-#2-\endcsname{#3}}
-\def\getpos#1#2{\csname GO-#1-#2-\endcsname}
+\def\setpos#1#2#3{\expandafter\def\csname LIGHT-#1-#2-\endcsname{#3}}
+\def\getpos#1#2{\csname LIGHT-#1-#2-\endcsname}
 \def\setmpos#1#2#3{\expandafter\def\csname TMP-#1-#2-\endcsname{#3}}
 \def\getmpos#1#2{\csname TMP-#1-#2-\endcsname}
+
+\newcount\nbon
+\newcount\around
+\newcount\ip
+\newcount\im
+\newcount\jp
+\newcount\jm
 
 \newif\ifcontinue
 \makeatletter
@@ -46,28 +59,26 @@
 % Display the array of light in a tikz figure
 % Also displays the number of light that are on
 \def\display{%
-    \newcount\nbon
     \nbon=0
     \begin{tikzpicture}[scale=0.1]
-        \foreach \i in {1,2,...,100}{%
-            \foreach \j in {1,2,...,100}{%
+        \foreach \i in {1,2,...,\size}{%
+            \foreach \j in {1,2,...,\size}{%
                 \if\getpos{\i}{\j}1
                     \global\advance\nbon by1
                     \draw[fill=magenta] (\i, \j) circle[radius=0.5cm];
-                \else
-                    \draw[] (\i, \j) circle[radius=0.5cm];
+                % \else
+                    % \draw[] (\i, \j) circle[radius=0.5cm];
                 \fi
             }
         }
-        \draw (101, 100) node[anchor=north west] {\the\nbon\ are On};
+        \draw (\size+1, \size) node[anchor=north west] {\the\nbon\ are On};
     \end{tikzpicture}
 }
 
 \def\counton{%
-    \newcount\nbon
     \nbon=0
-    \foreach \i in {1,2,...,100}{%
-        \foreach \j in {1,2,...,100}{%
+    \foreach \i in {1,2,...,\size}{%
+        \foreach \j in {1,2,...,\size}{%
             \if\getpos{\i}{\j}1
                 \global\advance\nbon by1
                 % F\,\the\nbon
@@ -75,6 +86,84 @@
         }
     }
     There are \the\nbon\ that are On!
+}
+
+%Copy the content of the temp array into the array
+\def\copyback{%
+    \foreach \i in {1,2,...,\size}{%
+        \foreach \j in {1,2,...,\size}{%
+            \global\setpos{\i}{\j}{\getmpos{\i}{\j}}
+        }
+    }
+}
+
+
+\def\lightstep{%
+    \foreach \i in {1,2,...,\size}{%
+        \foreach \j in {1,2,...,\size}{%
+            \around=0
+
+            \ip=\i
+            \advance\ip by1
+            \im=\i
+            \advance\im by-1
+            \jp=\j
+            \advance\jp by1
+            \jm=\j
+            \advance\jm by-1
+
+            % \i, \j\ :
+            \if\getpos{\the\im}{\the\jm}1
+                \advance\around by1
+            \fi
+            \if\getpos{\the\im}{\j}1
+                \advance\around by1
+            \fi
+            \if\getpos{\the\im}{\the\jp}1
+                \advance\around by1
+            \fi
+
+            \if\getpos{\i}{\the\jm}1
+                \advance\around by1
+            \fi
+            \if\getpos{\i}{\the\jp}1
+                \advance\around by1
+            \fi
+
+            \if\getpos{\the\ip}{\the\jm}1
+                \advance\around by1
+            \fi
+            \if\getpos{\the\ip}{\j}1
+                \advance\around by1
+            \fi
+            \if\getpos{\the\ip}{\the\jp}1
+                \advance\around by1
+            \fi
+
+            % \phantom{www}\the\around%
+            \if\getpos{\i}{\j}1
+                \if\the\around 2
+                    \global\setmpos{\i}{\j}{1}
+                    % Stays on (2)
+                \else\if\the\around 3
+                    \global\setmpos{\i}{\j}{1}
+                    % Stays on (3)
+                \else
+                    \global\setmpos{\i}{\j}{0}
+                    % Get off
+                \fi
+                \fi
+            \else
+                \if\the\around 3
+                    \global\setmpos{\i}{\j}{1}
+                    % Get ON !
+                \else
+                    \global\setmpos{\i}{\j}{0}
+                    % remains OFF
+                \fi
+            \fi
+        }
+    }
 }
 
 \begin{document}
@@ -89,8 +178,8 @@ In this document, we define a « two dimensional » array to store the lights\fo
 It defines two macros \mintex{\setpos} and \mintex{\getpos} that allow to respectively set and read the value at a given row and column in the array.
 
 \begin{minted}{tex}
-\def\setpos#1#2#3{\expandafter\def\csname GO-#1-#2-\endcsname{#3}}
-\def\getpos#1#2{\csname GO-#1-#2-\endcsname}
+\def\setpos#1#2#3{\expandafter\def\csname LIGHT-#1-#2-\endcsname{#3}}
+\def\getpos#1#2{\csname LIGHT-#1-#2-\endcsname}
 \end{minted}
 
 To fill this array, we read the input file and treat each line one after the other.
@@ -98,6 +187,8 @@ To do so, we use two cunts \mintex{\idi} and \mintex{\idj} that will be the indi
 Then for each line, we use a separate macro, \mintex{\treatLine{\content}} that will recursively treat each character of the line.
 If the character is a \texttt{.}, then nothing happens, and if it's another character (in the present case, it is always a \texttt{\#}) then the corresponding case of the array is set to \texttt{1}.
 In these process, we manually increment the values of \mintex{\idi} and \mintex{\idj}.
+
+We also define a macro \mintex{\size} which is the total size of the grid (\texttt{100} in the input, but \texttt{6} in the example).
 
 \begin{minted}{tex}
 % Open the file for reading
@@ -136,7 +227,6 @@ In these process, we manually increment the values of \mintex{\idi} and \mintex{
 \begin{minted}{tex}
 \newif\ifcontinue
 \makeatletter
-
 % Fill the current line of the main array, from the input string
 \def\treatLine#1{%
   \expandafter\@treatLine#1\relax
@@ -159,10 +249,6 @@ In these process, we manually increment the values of \mintex{\idi} and \mintex{
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Code 🡓
 
-
-% Open the file for reading
-\newread\myfile
-\openin\myfile=input.txt
 
 \newcount\idi
 \idi=0
@@ -202,39 +288,119 @@ By making a nested loop, we can display the array and count the light that are o
 Precisely, we use a count initially at 0 and use two \mintex{foreach} loops.
 Note that we need to use the \mintex{\global} keywords inside the loop\footnote{\url{https://tex.stackexchange.com/a/766457/243474}.}.
 
-We define two macros \mintex{\display} and \mintex{\counton} that to that.
-Note the second is ientical to the first on, but without the display using Ti\emph{k}Z (so I do not rewrite the code here).
+We define two macros \mintex{\display} and \mintex{\counton} that do that.
+Note the second is identical to the first on, but without the display using Ti\emph{k}Z (so I do not rewrite the code here).
 
 \begin{minted}{tex}
 \def\display{%
     \newcount\nbon
     \nbon=0
     \begin{tikzpicture}[scale=0.1]
-        \foreach \i in {1,2,...,100}{%
-            \foreach \j in {1,2,...,100}{%
+        \foreach \i in {1,2,...,\size}{%
+            \foreach \j in {1,2,...,\size}{%
                 \if\getpos{\i}{\j}1
                     \global\advance\nbon by1
                     \draw[fill=magenta] (\i, \j) circle[radius=0.5cm];
                 \else
-                    \draw[] (\i, \j) circle[radius=0.5cm];
+                    % To avoid excedding TeX capacity, we only draw on lights
+                    % \draw[] (\i, \j) circle[radius=0.5cm];
                 \fi
             }
         }
-        \draw (101, 100) node[anchor=north west] {\the\nbon\ are On};
+        \draw (\size+1, \size) node[anchor=north west] {\the\nbon\ are On};
     \end{tikzpicture}
 }
 \end{minted}
 
+Tiny remark : because of default axis orientation, there is a quarter-turn rotation in what is displayed here compared to what is on advent of code page. From here, apply a rotation of $-\frac\pi2$ to get what is displayed on the problem page.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Code 🡓
+
+\counton
+
+
+\begin{center}
+    \display
+\end{center}
+
+
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Text 🡓
+
+\section{Before getting in the hard, some utils macros}
+
+In the following, we will apply the rule for switching on and off the lights.
+As to compute light at time step $k$ we use the state at time $k-1$ that cannot be changed, we need to get a temporary array on which we will set the results, and in the end the values of this temporary array are applied back to the main light array.
+
+First we define the macros \mintex{\setmpos} and \mintex{\getmpos} that are identical as the one for the light array, and we define the \mintex{\copyback} macro :
+
+\begin{minted}{tex}
+\def\copyback{%
+    \foreach \i in {1,2,...,\size}{%
+        \foreach \j in {1,2,...,\size}{%
+            \global\setpos{\i}{\j}{\getmpos{\i}{\j}}
+        }
+    }
+}
+\end{minted}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Code 🡓
+
+%% just for tests
+
+% \foreach\i in {0,1,...,100}{
+%     \foreach\j in {0, 2, 13}
+%     {
+%         \global\setmpos{\i}{\j}{1}
+%     }
+% }
+
+
+% \copyback
+
+% \display
+% \counton
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Text 🡓
+
+\section{One step}
+
+\getpos{1}{3}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Code 🡓
 
 
+\lightstep
+\copyback
+
 \display
 
-\counton
+\display
+\lightstep
+\display
 
 
 
+% \lightstep
+% \copyback
+
+% \display
+
+% \UseName{int_step_inline:nnn}{0}{5}{%
+%     Iteration #1
+
+%     \lightstep
+%     \copyback
+
+%     \display
+%     \par
+% }
 
 \end{document}
