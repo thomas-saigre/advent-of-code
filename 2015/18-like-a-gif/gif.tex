@@ -6,6 +6,7 @@
 \usepackage[left=1.5cm,right=1.5cm,top=2cm,bottom=2cm]{geometry}
 \usepackage{url}
 \usepackage{minted}
+\usepackage{multicol}
 \providecommand{\mintex}[1]{\mintinline[breaklines]{tex}{#1}}
 
 % Open the file for reading
@@ -59,6 +60,7 @@
 % Display the array of light in a tikz figure
 % Also displays the number of light that are on
 \def\display{%
+    \begin{center}
     \nbon=0
     \begin{tikzpicture}[scale=0.1]
         \draw (0, 0) -- (\size+1, 0) -- (\size+1, \size+1) -- (0, \size+1) -- cycle;
@@ -67,13 +69,15 @@
                 \if\getpos{\i}{\j}1
                     \global\advance\nbon by1
                     \draw[fill=magenta] (\i, \j) circle[radius=0.5cm];
-                % \else
+                \else
+                    % To avoid excedding TeX capacity, we only draw on lights
                     % \draw[] (\i, \j) circle[radius=0.5cm];
                 \fi
             }
         }
-        \draw (\size+1, \size) node[anchor=north west] {\the\nbon\ are On};
+        \draw (\size/2, \size+1) node[anchor=south] {\the\nbon\ are On};
     \end{tikzpicture}
+    \end{center}
 }
 
 \def\counton{%
@@ -295,6 +299,7 @@ Note the second is identical to the first on, but without the display using Ti\e
 \begin{minted}{tex}
 \newcount\nbon
 \def\display{%
+    \begin{center}
     \nbon=0
     \begin{tikzpicture}[scale=0.1]
         \draw (0, 0) -- (\size+1, 0) -- (\size+1, \size+1) -- (0, \size+1) -- cycle;
@@ -309,8 +314,9 @@ Note the second is identical to the first on, but without the display using Ti\e
                 \fi
             }
         }
-        \draw (\size+1, \size) node[anchor=north west] {\the\nbon\ are On};
+        \draw (\size/2, \size+1) node[anchor=south] {\the\nbon\ are On};
     \end{tikzpicture}
+    \end{center}
 }
 \end{minted}
 
@@ -319,12 +325,7 @@ Tiny remark : because of default axis orientation, there is a quarter-turn rotat
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Code 🡓
 
-\counton
-
-
-\begin{center}
-    \display
-\end{center}
+\display
 
 
 
@@ -460,8 +461,8 @@ Then we just go on !
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Code 🡓
 
 
-
-
+\lightstep
+\copyback
 
 \display
 
@@ -470,7 +471,7 @@ Then we just go on !
 
 We just make a loop to call \mintex{\lightstep} and \mintex{\copyback} the desired number of time.
 As right above we already made one iteration, we begin the loop at 2.
-I also comment the line to display, because with the huge grid the document would be too large (and it might reach \TeX\ capacity...)
+I also comment the line to display, because with the huge grid the document would be very large (and it might reach \TeX\ capacity...)
 
 \begin{minted}{tex}
 \UseName{int_step_inline:nnn}{2}{100}{%
@@ -483,19 +484,22 @@ I also comment the line to display, because with the huge grid the document woul
 \end{minted}
 
 
+\begin{multicols}{3}
+    \UseName{int_step_inline:nnn}{2}{100}{%
+        \lightstep
+        \copyback
+        Iteration #1: \counton
+        % \display
+        \par
+    }
+\end{multicols}
 
-\UseName{int_step_inline:nnn}{2}{100}{%
-    \lightstep
-    \copyback
-    Iteration #1: \counton
-    % \display
-    \par
-}
 
 \display
 
 \begin{center}
-    Solution of part I : \counton
+    \Large
+    \textbf{Solution of part I : \counton}
 \end{center}
 
 \end{document}
