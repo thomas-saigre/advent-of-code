@@ -16,7 +16,11 @@
 \def\size{100}
 \openin\myfile=input.txt
 
-\title{Advent of code : 2015 day 18}
+\title{%
+    Advent of code : 2015 day 18 \\
+    \large
+    \url{https://adventofcode.com/2015/day/18}
+}
 \author{In \LaTeX\ }
 \date{Many years later !}
 
@@ -209,7 +213,7 @@ It defines two macros \mintex{\setpos} and \mintex{\getpos} that allow to respec
 \end{minted}
 
 To fill this array, we read the input file and treat each line one after the other.
-To do so, we use two cunts \mintex{\idi} and \mintex{\idj} that will be the indices of the light in the array, and read the file line by line into \mintex{\content}
+To do so, we use two counts \mintex{\idi} and \mintex{\idj} that will be the indices of the light in the array, and read the file line by line into \mintex{\content}
 Then for each line, we use a separate macro, \mintex{\treatLine{\content}} that will recursively treat each character of the line.
 If the character is a \texttt{.}, then nothing happens, and if it's another character (in the present case, it is always a \texttt{\#}) then the corresponding case of the array is set to \texttt{1}.
 In these process, we manually increment the values of \mintex{\idi} and \mintex{\idj}.
@@ -260,14 +264,12 @@ We also define a macro \mintex{\size} which is the total size of the grid (\text
         % End of the string
     \else
         \ifx #1.%
-            % Off
             % \the\idi\ \the\idj\ is Off
-            \setbpos{\the\idi}{\the\idj}{0}
+            \setbpos{\the\idi}{\the\idj}{0}     % For part II
             \else
-            % On
             % \the\idi\ \the\idj\ is On
             \setpos{\the\idi}{\the\idj}{1}
-            \setbpos{\the\idi}{\the\idj}{1}
+            \setbpos{\the\idi}{\the\idj}{1}     % For part II
         \fi
         \expandafter\@treatLine
     \fi
@@ -396,7 +398,7 @@ First we define the macros \mintex{\setmpos} and \mintex{\getmpos} that are iden
 
 \section{One step}
 
-To simulate one step of switching on and off the lights, we just apply the algorithm described.
+To simulate one step of switching on and off the lights, we just apply the cellular automaton algorithm described on the page.
 This may not be the best way to do it, but I use define one count that count the number of light that are on.
 And other counts that contain the values of $i\pm1$ and $j\pm1$.
 These counters need to be defined outside the macro, this is due to \TeX\ behavior, that will define a new one without erasing the previous ones, and eventually gets out of room to create new count.
@@ -446,26 +448,20 @@ These counters need to be defined outside the macro, this is due to \TeX\ behavi
                 \advance\around by1
             \fi
 
-            % \phantom{www}\the\around%
             \if\getpos{\i}{\j}1
                 \if\the\around 2
-                    \global\setmpos{\i}{\j}{1}
-                    % Stays on (2)
+                    \global\setmpos{\i}{\j}{1}      % Stays ON (2)
                 \else\if\the\around 3
-                    \global\setmpos{\i}{\j}{1}
-                    % Stays on (3)
+                    \global\setmpos{\i}{\j}{1}      % Stays ON (3)
                 \else
-                    \global\setmpos{\i}{\j}{0}
-                    % Get off
+                    \global\setmpos{\i}{\j}{0}      % Gets OFF
                 \fi
                 \fi
             \else
                 \if\the\around 3
-                    \global\setmpos{\i}{\j}{1}
-                    % Get ON !
+                    \global\setmpos{\i}{\j}{1}      % Gets ON !
                 \else
-                    \global\setmpos{\i}{\j}{0}
-                    % remains OFF
+                    \global\setmpos{\i}{\j}{0}      % Remains OFF
                 \fi
             \fi
         }
@@ -493,7 +489,7 @@ Then we just go on !
 
 We just make a loop to call \mintex{\lightstep} and \mintex{\copyback} the desired number of time.
 As right above we already made one iteration, we begin the loop at 2.
-I also comment the line to display, because with the huge grid the document would be very large (and it might reach \TeX\ capacity...)
+Here, I have commented the line to display, because with the huge grid the document would be very large.
 
 \begin{minted}{tex}
 \UseName{int_step_inline:nnn}{2}{100}{%
@@ -531,11 +527,11 @@ I also comment the line to display, because with the huge grid the document woul
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Text 🡓
 
-Part II is the same as Part I, but we sligtly modify the initial configuration, and run again the loop of 100 iterations.
+Part II is the same as Part I, we run again the loop of 100 iterations, but at each time we need to slightly modify the configuration.
 
 As we have made modifications to the main table, we need to create it back.
-Actually, in the macro \mintex{\treatLine}, we added two lines to fill a thirch backup array with the macro \mintex{\setbpos} with \texttt{0} or \texttt{1} whether the light is On of Off.
-An we also define another macro, \mintex{\reset} working the same way as \mintex{\copyback}, to put back the values of the backup array into the main one.
+Actually, in the macro \mintex{\treatLine}, we added two lines to fill a third backup array with the macro \mintex{\setbpos} with \texttt{0} or \texttt{1} whether the light is On of Off.
+And we also define another macro, \mintex{\reset} working the same way as \mintex{\copyback}, to put back the values of the backup array into the main one.
 
 Then, we add a macro that manually make the four corner lights on, that will be called at each iteration of the loop :
 
@@ -549,23 +545,37 @@ Then, we add a macro that manually make the four corner lights on, that will be 
 }
 \end{minted}
 
+We set the thing up :
+
+\begin{minted}{tex}
+\reset
+\cornerLights
+
+\display
+\end{minted}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Code 🡓
 
 \reset
 \cornerLights
 
 \display
 
-And we do the same loop as before (this time we begin at 1, because we have not made a first step), but by calling \mintex{\cornerLights} at each iteration.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Text 🡓
+
+And we do the same loop as before (this time we begin at 1, because we have not made a first step), and we call \mintex{\cornerLights} at each iteration.
 
 \begin{minted}{tex}
 \UseName{int_step_inline:nnn}{1}{5}{%
-        \lightstep
-        \copyback
-        \cornerLights
-        Iteration #1: \counton
-        % \display
-        \par
-    }
+    \lightstep
+    \copyback
+    \cornerLights
+    Iteration #1: \counton
+    % \display
+    \par
+}
 \end{minted}
 
 
@@ -588,6 +598,9 @@ And we do the same loop as before (this time we begin at 1, because we have not 
     \Large
     \textbf{Solution of part II : \counton}
 \end{center}
+
+
+This file took 1 min 7.669 s to compile (without the call to \mintex{\display}, and 1 min 23.965 s with the call).
 
 
 \end{document}
