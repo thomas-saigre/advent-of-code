@@ -25,6 +25,8 @@
 \def\getpos#1#2{\csname LIGHT-#1-#2-\endcsname}
 \def\setmpos#1#2#3{\expandafter\def\csname TMP-#1-#2-\endcsname{#3}}
 \def\getmpos#1#2{\csname TMP-#1-#2-\endcsname}
+\def\setbpos#1#2#3{\expandafter\def\csname BACKUP-#1-#2-\endcsname{#3}}
+\def\getbpos#1#2{\csname BACKUP-#1-#2-\endcsname}
 
 \newcount\nbon
 \newcount\around
@@ -48,10 +50,12 @@
         \ifx #1.%
             % Off
             % \the\idi\ \the\idj\ is Off
+            \setbpos{\the\idi}{\the\idj}{0}
             \else
             % On
             % \the\idi\ \the\idj\ is On
             \setpos{\the\idi}{\the\idj}{1}
+            \setbpos{\the\idi}{\the\idj}{1}
         \fi
         \expandafter\@treatLine
     \fi
@@ -93,13 +97,30 @@
     \the\nbon
 }
 
-%Copy the content of the temp array into the array
+% Copy the content of the temp array into the array
 \def\copyback{%
     \foreach \i in {1,2,...,\size}{%
         \foreach \j in {1,2,...,\size}{%
             \global\setpos{\i}{\j}{\getmpos{\i}{\j}}
         }
     }
+}
+
+% Reset the array
+\def\reset{%
+    \foreach \i in {1,2,...,\size}{%
+        \foreach \j in {1,2,...,\size}{%
+            \global\setpos{\i}{\j}{\getbpos{\i}{\j}}
+        }
+    }
+}
+
+% The four corners lights are stuck on
+\def\cornerLights{%
+    \setpos{1}{1}{1}
+    \setpos{1}{\size}{1}
+    \setpos{\size}{1}{1}
+    \setpos{\size}{\size}{1}
 }
 
 
@@ -233,17 +254,20 @@ We also define a macro \mintex{\size} which is the total size of the grid (\text
 \newif\ifcontinue
 \makeatletter
 % Fill the current line of the main array, from the input string
-\def\treatLine#1{%
-  \expandafter\@treatLine#1\relax
-}
 \def\@treatLine#1{%
     \advance\idj by1
     \ifx\relax#1%
         % End of the string
     \else
-        \ifx #1.%    % Off
-        \else%       % On
+        \ifx #1.%
+            % Off
+            % \the\idi\ \the\idj\ is Off
+            \setbpos{\the\idi}{\the\idj}{0}
+            \else
+            % On
+            % \the\idi\ \the\idj\ is On
             \setpos{\the\idi}{\the\idj}{1}
+            \setbpos{\the\idi}{\the\idj}{1}
         \fi
         \expandafter\@treatLine
     \fi
@@ -330,11 +354,9 @@ Tiny remark : because of default axis orientation, there is a quarter-turn rotat
 
 
 
-
+\section{Before getting in the hard, some utils macros}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Text 🡓
-
-\section{Before getting in the hard, some utils macros}
 
 In the following, we will apply the rule for switching on and off the lights.
 As to compute light at time step $k$ we use the state at time $k-1$ that cannot be changed, we need to get a temporary array on which we will set the results, and in the end the values of this temporary array are applied back to the main light array.
@@ -501,5 +523,71 @@ I also comment the line to display, because with the huge grid the document woul
     \Large
     \textbf{Solution of part I : \counton}
 \end{center}
+
+
+
+
+\section{Part II}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Text 🡓
+
+Part II is the same as Part I, but we sligtly modify the initial configuration, and run again the loop of 100 iterations.
+
+As we have made modifications to the main table, we need to create it back.
+Actually, in the macro \mintex{\treatLine}, we added two lines to fill a thirch backup array with the macro \mintex{\setbpos} with \texttt{0} or \texttt{1} whether the light is On of Off.
+An we also define another macro, \mintex{\reset} working the same way as \mintex{\copyback}, to put back the values of the backup array into the main one.
+
+Then, we add a macro that manually make the four corner lights on, that will be called at each iteration of the loop :
+
+\begin{minted}{tex}
+% The four corners lights are stuck on
+\def\cornerLights{%
+    \setpos{1}{1}{1}
+    \setpos{1}{\size}{1}
+    \setpos{\size}{1}{1}
+    \setpos{\size}{\size}{1}
+}
+\end{minted}
+
+
+\reset
+\cornerLights
+
+\display
+
+And we do the same loop as before (this time we begin at 1, because we have not made a first step), but by calling \mintex{\cornerLights} at each iteration.
+
+\begin{minted}{tex}
+\UseName{int_step_inline:nnn}{1}{5}{%
+        \lightstep
+        \copyback
+        \cornerLights
+        Iteration #1: \counton
+        % \display
+        \par
+    }
+\end{minted}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Code 🡓
+
+\begin{multicols}{3}
+    \UseName{int_step_inline:nnn}{1}{100}{%
+        \lightstep
+        \copyback
+        \cornerLights
+        Iteration #1: \counton
+        % \display
+        \par
+    }
+\end{multicols}
+
+\display
+
+\begin{center}
+    \Large
+    \textbf{Solution of part II : \counton}
+\end{center}
+
 
 \end{document}
