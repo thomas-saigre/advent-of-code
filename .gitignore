@@ -8,7 +8,9 @@
 *.fdb_latexmk
 *.fls
 *.synctex.gz
+*.synctex(busy)
 *.fods
+*.pyg
 2024/06-guard-gallivant/06
 2021/02-dive/partII.png
 2015/08-matchsticks/i
@@ -19,3 +21,5 @@
 .venv/*
 2015/11-corporate-policy/password
 2025/07-laboratories/07
+**/_minted-**/**
+!2015/18-like-a-gif/gif.pdf

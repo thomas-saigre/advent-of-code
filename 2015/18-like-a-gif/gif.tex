@@ -1,0 +1,606 @@
+\documentclass{article}
+\usepackage[T1]{fontenc}
+\usepackage{ifthen}
+\usepackage{tikz}
+\usetikzlibrary{math}
+\usepackage[left=1.5cm,right=1.5cm,top=2cm,bottom=2cm]{geometry}
+\usepackage{url}
+\usepackage{minted}
+\usepackage{multicol}
+\providecommand{\mintex}[1]{\mintinline[breaklines]{tex}{#1}}
+
+% Open the file for reading
+\newread\myfile
+% \def\size{6}
+% \openin\myfile=example.txt
+\def\size{100}
+\openin\myfile=input.txt
+
+\title{%
+    Advent of code : 2015 day 18 \\
+    \large
+    \url{https://adventofcode.com/2015/day/18}
+}
+\author{In \LaTeX\ }
+\date{Many years later !}
+
+
+\def\setpos#1#2#3{\expandafter\xdef\csname LIGHT-#1-#2-\endcsname{#3}}
+\def\getpos#1#2{\csname LIGHT-#1-#2-\endcsname}
+\def\setmpos#1#2#3{\expandafter\def\csname TMP-#1-#2-\endcsname{#3}}
+\def\getmpos#1#2{\csname TMP-#1-#2-\endcsname}
+\def\setbpos#1#2#3{\expandafter\def\csname BACKUP-#1-#2-\endcsname{#3}}
+\def\getbpos#1#2{\csname BACKUP-#1-#2-\endcsname}
+
+\newcount\nbon
+\newcount\around
+\newcount\ip
+\newcount\im
+\newcount\jp
+\newcount\jm
+
+\newif\ifcontinue
+\makeatletter
+
+% Fill the current line of the main array, from the input string
+\def\treatLine#1{%
+  \expandafter\@treatLine#1\relax
+}
+\def\@treatLine#1{%
+    \advance\idj by1
+    \ifx\relax#1%
+        % End of the string
+    \else
+        \ifx #1.%
+            % Off
+            % \the\idi\ \the\idj\ is Off
+            \setbpos{\the\idi}{\the\idj}{0}
+            \else
+            % On
+            % \the\idi\ \the\idj\ is On
+            \setpos{\the\idi}{\the\idj}{1}
+            \setbpos{\the\idi}{\the\idj}{1}
+        \fi
+        \expandafter\@treatLine
+    \fi
+}
+
+% Display the array of light in a tikz figure
+% Also displays the number of light that are on
+\def\display{%
+    \begin{center}
+    \nbon=0
+    \begin{tikzpicture}[scale=0.1]
+        \draw (0, 0) -- (\size+1, 0) -- (\size+1, \size+1) -- (0, \size+1) -- cycle;
+        \foreach \i in {1,2,...,\size}{%
+            \foreach \j in {1,2,...,\size}{%
+                \if\getpos{\i}{\j}1
+                    \global\advance\nbon by1
+                    \draw[fill=magenta] (\i, \j) circle[radius=0.5cm];
+                \else
+                    % To avoid excedding TeX capacity, we only draw on lights
+                    % \draw[] (\i, \j) circle[radius=0.5cm];
+                \fi
+            }
+        }
+        \draw (\size/2, \size+1) node[anchor=south] {\the\nbon\ are On};
+    \end{tikzpicture}
+    \end{center}
+}
+
+\def\counton{%
+    \nbon=0%
+    \foreach \i in {1,2,...,\size}{%
+        \foreach \j in {1,2,...,\size}{%
+            \if\getpos{\i}{\j}1%
+                \global\advance\nbon by1%
+                % F\,\the\nbon
+            \fi%
+        }%
+    }%
+    \the\nbon
+}
+
+% Copy the content of the temp array into the array
+\def\copyback{%
+    \foreach \i in {1,2,...,\size}{%
+        \foreach \j in {1,2,...,\size}{%
+            \global\setpos{\i}{\j}{\getmpos{\i}{\j}}
+        }
+    }
+}
+
+% Reset the array
+\def\reset{%
+    \foreach \i in {1,2,...,\size}{%
+        \foreach \j in {1,2,...,\size}{%
+            \global\setpos{\i}{\j}{\getbpos{\i}{\j}}
+        }
+    }
+}
+
+% The four corners lights are stuck on
+\def\cornerLights{%
+    \setpos{1}{1}{1}
+    \setpos{1}{\size}{1}
+    \setpos{\size}{1}{1}
+    \setpos{\size}{\size}{1}
+}
+
+
+\def\lightstep{%
+    \foreach \i in {1,2,...,\size}{%
+        \foreach \j in {1,2,...,\size}{%
+            \around=0
+
+            \ip=\i
+            \advance\ip by1
+            \im=\i
+            \advance\im by-1
+            \jp=\j
+            \advance\jp by1
+            \jm=\j
+            \advance\jm by-1
+
+            % \i, \j\ :
+            \if\getpos{\the\im}{\the\jm}1
+                \advance\around by1
+            \fi
+            \if\getpos{\the\im}{\j}1
+                \advance\around by1
+            \fi
+            \if\getpos{\the\im}{\the\jp}1
+                \advance\around by1
+            \fi
+
+            \if\getpos{\i}{\the\jm}1
+                \advance\around by1
+            \fi
+            \if\getpos{\i}{\the\jp}1
+                \advance\around by1
+            \fi
+
+            \if\getpos{\the\ip}{\the\jm}1
+                \advance\around by1
+            \fi
+            \if\getpos{\the\ip}{\j}1
+                \advance\around by1
+            \fi
+            \if\getpos{\the\ip}{\the\jp}1
+                \advance\around by1
+            \fi
+
+            % \phantom{www}\the\around%
+            \if\getpos{\i}{\j}1
+                \if\the\around 2
+                    \global\setmpos{\i}{\j}{1}
+                    % Stays on (2)
+                \else\if\the\around 3
+                    \global\setmpos{\i}{\j}{1}
+                    % Stays on (3)
+                \else
+                    \global\setmpos{\i}{\j}{0}
+                    % Get off
+                \fi
+                \fi
+            \else
+                \if\the\around 3
+                    \global\setmpos{\i}{\j}{1}
+                    % Get ON !
+                \else
+                    \global\setmpos{\i}{\j}{0}
+                    % remains OFF
+                \fi
+            \fi
+        }
+    }
+}
+
+\begin{document}
+
+\maketitle
+
+\section{Read the input file}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Text 🡓
+
+In this document, we define a « two dimensional » array to store the lights\footnote{Source: \url{https://tex.stackexchange.com/a/367490/243474}.}.
+It defines two macros \mintex{\setpos} and \mintex{\getpos} that allow to respectively set and read the value at a given row and column in the array.
+
+\begin{minted}{tex}
+\def\setpos#1#2#3{\expandafter\xdef\csname LIGHT-#1-#2-\endcsname{#3}}
+\def\getpos#1#2{\csname LIGHT-#1-#2-\endcsname}
+\end{minted}
+
+To fill this array, we read the input file and treat each line one after the other.
+To do so, we use two counts \mintex{\idi} and \mintex{\idj} that will be the indices of the light in the array, and read the file line by line into \mintex{\content}
+Then for each line, we use a separate macro, \mintex{\treatLine{\content}} that will recursively treat each character of the line.
+If the character is a \texttt{.}, then nothing happens, and if it's another character (in the present case, it is always a \texttt{\#}) then the corresponding case of the array is set to \texttt{1}.
+In these process, we manually increment the values of \mintex{\idi} and \mintex{\idj}.
+
+We also define a macro \mintex{\size} which is the total size of the grid (\texttt{100} in the input, but \texttt{6} in the example).
+
+\begin{minted}{tex}
+% Open the file for reading
+\newread\myfile
+\openin\myfile=input.txt
+
+\newcount\idi
+\idi=0
+\newcount\idj
+\idj=0
+
+% Define a macro to store the contents of the file
+\newtoks\content
+
+\continuetrue
+\loop
+\read\myfile to \content
+
+\ifeof\myfile
+    \continuefalse
+\else
+    \advance\idi by1
+    \idj=0
+    % \content
+    \treatLine{\content}
+    % \parseline{\content}
+    % Line is \content
+\fi
+\ifcontinue
+\repeat
+
+% Close the file
+\closein\myfile
+\end{minted}
+
+\begin{minted}{tex}
+\newif\ifcontinue
+\makeatletter
+% Fill the current line of the main array, from the input string
+\def\@treatLine#1{%
+    \advance\idj by1
+    \ifx\relax#1%
+        % End of the string
+    \else
+        \ifx #1.%
+            % \the\idi\ \the\idj\ is Off
+            \setbpos{\the\idi}{\the\idj}{0}     % For part II
+            \else
+            % \the\idi\ \the\idj\ is On
+            \setpos{\the\idi}{\the\idj}{1}
+            \setbpos{\the\idi}{\the\idj}{1}     % For part II
+        \fi
+        \expandafter\@treatLine
+    \fi
+}
+\end{minted}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Code 🡓
+
+
+\newcount\idi
+\idi=0
+\newcount\idj
+\idj=0
+
+% Define a macro to store the contents of the file
+\newtoks\content
+
+\continuetrue
+\loop
+\read\myfile to \content
+
+\ifeof\myfile
+    \continuefalse
+\else
+    \advance\idi by1
+    \idj=0
+    % \content
+    \treatLine{\content}
+    % \parseline{\content}
+    % Line is \content
+\fi
+\ifcontinue
+\repeat
+
+% Close the file
+\closein\myfile
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Text 🡓
+
+\section{Display the table, and count the lights}
+
+By making a nested loop, we can display the array and count the light that are on.
+Precisely, we use a count initially at 0 and use two \mintex{foreach} loops.
+Note that we need to use the \mintex{\global} keywords inside the loop\footnote{\url{https://tex.stackexchange.com/a/766457/243474}.}.
+
+We define two macros \mintex{\display} and \mintex{\counton} that do that.
+Note the second is identical to the first on, but without the display using Ti\emph{k}Z (so I do not rewrite the code here).
+
+\begin{minted}{tex}
+\newcount\nbon
+\def\display{%
+    \begin{center}
+    \nbon=0
+    \begin{tikzpicture}[scale=0.1]
+        \draw (0, 0) -- (\size+1, 0) -- (\size+1, \size+1) -- (0, \size+1) -- cycle;
+        \foreach \i in {1,2,...,\size}{%
+            \foreach \j in {1,2,...,\size}{%
+                \if\getpos{\i}{\j}1
+                    \global\advance\nbon by1
+                    \draw[fill=magenta] (\i, \j) circle[radius=0.5cm];
+                \else
+                    % To avoid excedding TeX capacity, we only draw on lights
+                    % \draw[] (\i, \j) circle[radius=0.5cm];
+                \fi
+            }
+        }
+        \draw (\size/2, \size+1) node[anchor=south] {\the\nbon\ are On};
+    \end{tikzpicture}
+    \end{center}
+}
+\end{minted}
+
+Tiny remark : because of default axis orientation, there is a quarter-turn rotation in what is displayed here compared to what is on advent of code page. From here, apply a rotation of $-\frac\pi2$ to get what is displayed on the problem page.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Code 🡓
+
+\display
+
+
+
+
+\section{Before getting in the hard, some utils macros}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Text 🡓
+
+In the following, we will apply the rule for switching on and off the lights.
+As to compute light at time step $k$ we use the state at time $k-1$ that cannot be changed, we need to get a temporary array on which we will set the results, and in the end the values of this temporary array are applied back to the main light array.
+
+First we define the macros \mintex{\setmpos} and \mintex{\getmpos} that are identical as the one for the light array, and we define the \mintex{\copyback} macro :
+
+\begin{minted}{tex}
+\def\copyback{%
+    \foreach \i in {1,2,...,\size}{%
+        \foreach \j in {1,2,...,\size}{%
+            \global\setpos{\i}{\j}{\getmpos{\i}{\j}}
+        }
+    }
+}
+\end{minted}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Code 🡓
+
+%% just for tests
+
+% \foreach\i in {0,1,...,100}{
+%     \foreach\j in {0, 2, 13}
+%     {
+%         \global\setmpos{\i}{\j}{1}
+%     }
+% }
+
+
+% \copyback
+
+% \display
+% \counton
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Text 🡓
+
+\section{One step}
+
+To simulate one step of switching on and off the lights, we just apply the cellular automaton algorithm described on the page.
+This may not be the best way to do it, but I use define one count that count the number of light that are on.
+And other counts that contain the values of $i\pm1$ and $j\pm1$.
+These counters need to be defined outside the macro, this is due to \TeX\ behavior, that will define a new one without erasing the previous ones, and eventually gets out of room to create new count.
+
+\begin{minted}{tex}
+\newcount\around
+\newcount\ip
+\newcount\im
+\newcount\jp
+\newcount\jm
+
+\def\lightstep{%
+    \foreach \i in {1,2,...,\size}{%
+        \foreach \j in {1,2,...,\size}{%
+            \around=0
+            \ip=\i
+            \advance\ip by1
+            \im=\i
+            \advance\im by-1
+            \jp=\j
+            \advance\jp by1
+            \jm=\j
+            \advance\jm by-1
+
+            \if\getpos{\the\im}{\the\jm}1   % i-1, j-1
+                \advance\around by1
+            \fi
+            \if\getpos{\the\im}{\j}1        % i-1, j
+                \advance\around by1
+            \fi
+            \if\getpos{\the\im}{\the\jp}1   % i-1, j+1
+                \advance\around by1
+            \fi
+            \if\getpos{\i}{\the\jm}1        % i, j-1
+                \advance\around by1
+            \fi
+            \if\getpos{\i}{\the\jp}1        % i, j+1
+                \advance\around by1
+            \fi
+            \if\getpos{\the\ip}{\the\jm}1   % i+1, j-1
+                \advance\around by1
+            \fi
+            \if\getpos{\the\ip}{\j}1        % i+1, j
+                \advance\around by1
+            \fi
+            \if\getpos{\the\ip}{\the\jp}1   % i+1, j+1
+                \advance\around by1
+            \fi
+
+            \if\getpos{\i}{\j}1
+                \if\the\around 2
+                    \global\setmpos{\i}{\j}{1}      % Stays ON (2)
+                \else\if\the\around 3
+                    \global\setmpos{\i}{\j}{1}      % Stays ON (3)
+                \else
+                    \global\setmpos{\i}{\j}{0}      % Gets OFF
+                \fi
+                \fi
+            \else
+                \if\the\around 3
+                    \global\setmpos{\i}{\j}{1}      % Gets ON !
+                \else
+                    \global\setmpos{\i}{\j}{0}      % Remains OFF
+                \fi
+            \fi
+        }
+    }
+}
+\end{minted}
+
+Then we just go on !
+
+\begin{minted}{tex}
+\lightstep
+\copyback
+\end{minted}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Code 🡓
+
+
+\lightstep
+\copyback
+
+\display
+
+
+\section{100 steps}
+
+We just make a loop to call \mintex{\lightstep} and \mintex{\copyback} the desired number of time.
+As right above we already made one iteration, we begin the loop at 2.
+Here, I have commented the line to display, because with the huge grid the document would be very large.
+
+\begin{minted}{tex}
+\UseName{int_step_inline:nnn}{2}{100}{%
+    \lightstep
+    \copyback
+    Iteration #1: \counton
+    % \display
+    \par
+}
+\end{minted}
+
+
+\begin{multicols}{3}
+    \UseName{int_step_inline:nnn}{2}{100}{%
+        \lightstep
+        \copyback
+        Iteration #1: \counton
+        % \display
+        \par
+    }
+\end{multicols}
+
+
+\display
+
+\begin{center}
+    \Large
+    \textbf{Solution of part I : \counton}
+\end{center}
+
+
+
+
+\section{Part II}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Text 🡓
+
+Part II is the same as Part I, we run again the loop of 100 iterations, but at each time we need to slightly modify the configuration.
+
+As we have made modifications to the main table, we need to create it back.
+Actually, in the macro \mintex{\treatLine}, we added two lines to fill a third backup array with the macro \mintex{\setbpos} with \texttt{0} or \texttt{1} whether the light is On of Off.
+And we also define another macro, \mintex{\reset} working the same way as \mintex{\copyback}, to put back the values of the backup array into the main one.
+
+Then, we add a macro that manually make the four corner lights on, that will be called at each iteration of the loop :
+
+\begin{minted}{tex}
+% The four corners lights are stuck on
+\def\cornerLights{%
+    \setpos{1}{1}{1}
+    \setpos{1}{\size}{1}
+    \setpos{\size}{1}{1}
+    \setpos{\size}{\size}{1}
+}
+\end{minted}
+
+We set the thing up :
+
+\begin{minted}{tex}
+\reset
+\cornerLights
+
+\display
+\end{minted}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Code 🡓
+
+\reset
+\cornerLights
+
+\display
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Text 🡓
+
+And we do the same loop as before (this time we begin at 1, because we have not made a first step), and we call \mintex{\cornerLights} at each iteration.
+
+\begin{minted}{tex}
+\UseName{int_step_inline:nnn}{1}{5}{%
+    \lightstep
+    \copyback
+    \cornerLights
+    Iteration #1: \counton
+    % \display
+    \par
+}
+\end{minted}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Code 🡓
+
+\begin{multicols}{3}
+    \UseName{int_step_inline:nnn}{1}{100}{%
+        \lightstep
+        \copyback
+        \cornerLights
+        Iteration #1: \counton
+        % \display
+        \par
+    }
+\end{multicols}
+
+\display
+
+\begin{center}
+    \Large
+    \textbf{Solution of part II : \counton}
+\end{center}
+
+
+This file took 1 min 7.669 s to compile (without the call to \mintex{\display}, and 1 min 23.965 s with the call).
+
+
+\end{document}
